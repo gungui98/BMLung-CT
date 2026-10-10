@@ -1,0 +1,62 @@
+# KC-Cancer-Final cohort (n = 2252).
+#
+# Flat layout — everything hangs off the dataset root:
+#
+#     <dataset_root>/
+#       ├── train/images/<case_id>.nii.gz
+#       ├── train/lesions/<case_id>/<lesion_id>/<annotator_id>.nii.gz
+#       ├── test/images/<case_id>.nii.gz
+#       ├── test/lesions/<case_id>/<lesion_id>/<annotator_id>.nii.gz
+#       ├── clinical.csv    (cleaned by scripts/prepare_kc_cancer.py)
+#       └── lesions.csv     (concat train+test, split-prefixed mask_path)
+#
+# Splits — set explicitly in clinical.csv:
+#   train: 1600 (80% of train/ folder, chronological)
+#   val:    400 (20% of train/ folder, chronological tail)
+#   test:   252 (held-out test/ folder, multi-annotator, 164 biopsy-confirmed)
+
+name: kc_cancer
+manifest:        clinical.csv
+strong_manifest: lesions.csv
+
+clinical_vars:
+  - age
+  - sex
+  - smoking_status
+  - pack_years
+  - bmi
+# Clinical data is recorded only for cancer cases on this cohort, so the
+# missingness pattern itself perfectly separates the labels. We force the
+# clinical input to zeros to remove this leak — the clinical branch only
+# learns a bias term.
+disable_clinical: true
+
+# Preprocessed-stack cache (skip nib.load + scipy.zoom resample each epoch).
+# Path is relative to --dataset-root; sub-silo is derived from the preprocess
+# parameters so changing spacing/window auto-invalidates.
+cache_dir: cache
+
+property_groups:
+  density:              [solid, part_solid, ground_glass]                       # consolidation dropped (0 train+val)
+  margin:               [smooth, lobulated, spiculated, irregular]
+  lobe:                 [RUL, RML, RLL, LUL, LLL]
+  inflammatory_pattern: [peripheral_halo, consolidation, tree_in_bud]           # "none" dropped (0 anywhere)
+  cavitation:           [absent, present]
+
+# Year-range fallback — unused since split is explicit in clinical.csv.
+split:
+  train:      [2017, 2023]
+  validation: [2023, 2024]
+  test:       [2024, 2026]
+
+preprocess:
+  in_plane_spacing_mm: 0.7
+  slice_spacing_mm:    1.5
+  lung_window:         [-1000, -400]
+  mediastinal_window:  [-150,   250]
+  # Single visible-region window (covers air → soft tissue on a CT viewer).
+  # When set, dual windowing above is bypassed → 1 channel per slice.
+  # Disabled by default: scale_aware_e2e.in_channels=6 needs dual (2×3-slice stack).
+  visible_window:      null
+  stack_size:          3
+  axial_crop:          352

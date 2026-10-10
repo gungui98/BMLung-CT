@@ -1,0 +1,7 @@
+# Plain 2-D U-Net trained on the slice-level dataset.
+# No MIL, no 2.5-D context — just per-slice segmentation.
+name: unet2d_slice
+target: bmct.models.unet2d_slice.UNet2DSlice
+params:
+  in_channels: 1        # single visible-window channel
+  base_channels: 32

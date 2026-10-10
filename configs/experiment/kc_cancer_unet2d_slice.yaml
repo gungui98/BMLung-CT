@@ -1,0 +1,29 @@
+# Slice-level smoke test: 2-D U-Net on every axial slice of every case.
+# Seg-only loss. 50 epochs to verify learnability.
+
+defaults:
+  - data:  kc_cancer
+  - model: unet2d_slice
+  - train: kc_cancer
+
+name: kc_cancer_unet2d_slice
+output_dir: runs/${name}
+
+# 1-channel visible-window already wired into kc_cancer.yaml.
+data:
+  preprocess:
+    axial_crop: 352
+    stack_size: 1            # unused by slice loader but keep consistent
+
+train:
+  batch_size: 32
+  epochs: 50
+  num_workers: 8
+  optimizer:
+    lr: 3.0e-4
+  scheduler:
+    warmup_epochs: 2
+
+loss:
+  dice_weight: 1.0
+  bce_weight:  0.5

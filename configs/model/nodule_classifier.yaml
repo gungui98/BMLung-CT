@@ -1,0 +1,9 @@
+# ResNet18 per-nodule classifier (stage 2).
+name: nodule_classifier
+target: bmct.models.nodule_classifier.NoduleClassifier
+params:
+  in_channels: 3        # 3 adjacent axial slices stacked into channel dim
+  pretrained: true
+  dropout: 0.4         # heavier dropout to fight overfit on small nodule set
+  n_density: 3   # consolidation dropped (0 train+val)
+  n_margin: 4

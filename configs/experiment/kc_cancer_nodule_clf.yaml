@@ -1,0 +1,39 @@
+# Stage 2 — per-nodule classifier.
+# Per-lesion crop (64×64 with 3 adjacent slices as channels) → ResNet18 → 4 heads.
+defaults:
+  - data:  kc_cancer
+  - model: nodule_classifier
+  - train: kc_cancer
+
+name: kc_cancer_nodule_clf
+output_dir: runs/${name}
+
+data:
+  preprocess:
+    axial_crop: 352          # unused by nodule loader, kept for PreprocConfig
+    stack_size: 1
+  crop_px: 64
+
+train:
+  batch_size: 64
+  epochs: 60
+  num_workers: 8
+  optimizer:
+    lr: 2.0e-4
+    weight_decay: 1.0e-3       # heavier WD vs 1e-4 baseline (anti-overfit)
+  scheduler:
+    warmup_epochs: 3
+
+augmentation:                  # heavier aug (anti-overfit)
+  enabled: true
+  rotate_deg: 20.0
+  shift_px:   6
+  brightness: 0.10
+  contrast:   0.10
+
+loss:
+  density_weight: 1.0
+  margin_weight:  1.0
+  cavit_weight:   1.0
+  cancer_weight:  1.0
+  class_balanced: true         # inverse-freq class weights for CE + pos_weight for BCE

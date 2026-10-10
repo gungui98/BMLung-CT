@@ -1,0 +1,6 @@
+name: deeplabv3p_2d
+target: bmct.models.smp_wrappers.DeepLabV3Plus2D
+params:
+  encoder_name: resnet50
+  encoder_weights: imagenet
+  in_channels: 1

@@ -1,0 +1,33 @@
+# DeepLabV3+ baseline (segmentation_models_pytorch, ResNet-50 encoder).
+defaults:
+  - data:  kc_cancer
+  - model: deeplabv3p_2d
+  - train: kc_cancer
+
+name: kc_cancer_deeplabv3p
+output_dir: runs/${name}
+
+data:
+  preprocess:
+    axial_crop: 352
+    stack_size: 1
+
+train:
+  batch_size: 12
+  epochs: 50
+  num_workers: 8
+  optimizer:
+    lr: 3.0e-4
+  scheduler:
+    warmup_epochs: 2
+
+augmentation:
+  enabled: true
+  rotate_deg: 15.0
+  shift_px:   20
+  brightness: 0.05
+  contrast:   0.05
+
+loss:
+  dice_weight: 1.0
+  bce_weight:  0.5

@@ -1,0 +1,9 @@
+name: nodule_classifier_convnext
+target: bmct.models.nodule_classifier.NoduleClassifier
+params:
+  in_channels: 3
+  pretrained: true
+  dropout: 0.4
+  n_density: 3
+  n_margin: 4
+  backbone: convnext_tiny

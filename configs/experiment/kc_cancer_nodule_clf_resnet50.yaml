@@ -1,0 +1,37 @@
+defaults:
+  - data:  kc_cancer
+  - model: nodule_classifier_resnet50
+  - train: kc_cancer
+
+name: kc_cancer_nodule_clf_resnet50
+output_dir: runs/${name}
+
+data:
+  preprocess:
+    axial_crop: 352
+    stack_size: 1
+  crop_px: 64
+
+train:
+  batch_size: 64
+  epochs: 60
+  num_workers: 8
+  optimizer:
+    lr: 2.0e-4
+    weight_decay: 1.0e-3
+  scheduler:
+    warmup_epochs: 3
+
+augmentation:
+  enabled: true
+  rotate_deg: 20.0
+  shift_px:   6
+  brightness: 0.10
+  contrast:   0.10
+
+loss:
+  density_weight: 1.0
+  margin_weight:  1.0
+  cavit_weight:   1.0
+  cancer_weight:  1.0
+  class_balanced: true

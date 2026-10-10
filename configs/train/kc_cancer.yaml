@@ -1,0 +1,42 @@
+# Training hyperparameters for the kc-cancer-final experiments.
+# Tuned for a single A100-80GB GPU; 2000 train+val cases.
+
+seed: 2026
+device: cuda
+num_workers: 8
+pin_memory: true
+
+optimizer:
+  name: adamw
+  lr: 1.0e-4
+  weight_decay: 1.0e-4
+
+scheduler:
+  name: cosine
+  warmup_epochs: 5
+
+epochs: 100
+batch_size: 32
+grad_clip_norm: 5.0
+amp: true
+min_strong_per_batch: 2
+persistent_workers: true
+
+checkpointing:
+  save_top_k: 2
+  monitor: val/auc
+  mode: max
+
+early_stopping:
+  patience: 20
+  monitor: val/auc
+  mode: max
+
+log:
+  every_n_steps: 25
+  backend: wandb            # csv | tensorboard | wandb
+  dir: runs
+  wandb:
+    project: lung-bmct
+    entity: ""              # leave empty to use default
+    log_best_worst_k: 8     # per-eval: top-K best/worst cases visualized

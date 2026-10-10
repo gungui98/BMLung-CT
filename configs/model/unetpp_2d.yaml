@@ -1,0 +1,6 @@
+name: unetpp_2d
+target: bmct.models.smp_wrappers.UNetPlusPlus2D
+params:
+  encoder_name: resnet34
+  encoder_weights: imagenet
+  in_channels: 1
